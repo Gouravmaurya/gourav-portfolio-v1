@@ -1,14 +1,14 @@
-# Gourav Maurya — Portfolio v1
+# Anurag Maurya — Portfolio v1
 
-An editorial portfolio for Gourav Maurya, full-stack developer and AI engineer.
+An editorial portfolio for Anurag Maurya, print and digital media designer in training at Macromedia Hamburg.
 
 ## Version 1.0.0
 
 - Personal photography and oversized editorial typography
-- Selected work: Safar AI, AI Social Media Agent, and Task Zen
-- Professional experience, skills, education, and résumé
+- Selected work: Medientage Hamburg, Safarai Visual Mark, and Safarai Stationery
+- Design background, skills, languages, and résumé
 - Responsive layouts and accessible navigation
-- Email and social links, with a copy-email action
+- Email and résumé links, with a copy-email action
 
 ## Run locally
 
@@ -31,6 +31,6 @@ Open http://localhost:4173.
 
 ## Deployment
 
-Publish the contents of `dist` using a static web host. The existing Sites configuration is retained for the private portfolio deployment.
+This is the `anurags` branch. `main` remains reserved for Gourav. The inherited Sites configuration belongs to Gourav’s existing private deployment; do not publish Anurag’s branch to that Site. Use a separate deployment target for Anurag. See `BRANCHES.md`.
 
-Personal photographs, résumé, and portfolio content belong to Gourav Maurya. No open-source license is granted by this repository.
+Personal photographs, résumé, and portfolio content belong to Anurag Maurya. No open-source license is granted by this repository.
