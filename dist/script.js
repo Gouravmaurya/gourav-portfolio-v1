@@ -2,7 +2,7 @@ const copyButton = document.querySelector('#copy-email');
 const copyStatus = document.querySelector('#copy-status');
 copyButton.addEventListener('click', async () => {
   try {
-    await navigator.clipboard.writeText('gouravmaurya351@gmail.com');
+    await navigator.clipboard.writeText('anuragmaurya51489@gmail.com');
     copyStatus.textContent = 'Email copied';
     copyButton.textContent = 'Copied ✓';
     setTimeout(() => { copyButton.textContent = 'Copy email ↗'; copyStatus.textContent = ''; }, 3000);
