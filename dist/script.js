@@ -11,9 +11,16 @@ copyButton.addEventListener('click', async () => {
   }
 });
 
-/* Motion: opening sequence + scroll reveals. Nothing here changes layout or content. */
+/* Motion: sticky header, opening sequence, scroll reveals, one delighter.
+   Nothing here changes layout or content. */
 (() => {
   const root = document.documentElement;
+
+  /* The sticky header needs its backdrop the moment the page leaves the top:
+     content scrolling under a transparent nav is unreadable. That is
+     legibility, not decoration, so it runs before the reduced-motion gate. */
+  addEventListener('scroll', () => root.classList.toggle('stuck', scrollY > 4), { passive: true });
+
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { root.classList.remove('intro'); return; }
 
   /* --- Scroll reveals: play once, stay put --- */
@@ -23,32 +30,69 @@ copyButton.addEventListener('click', async () => {
     io.unobserve(e.target);
   }), { rootMargin: '0px 0px -8% 0px', threshold: .08 });
 
-  const mark = (sel, { scope = document, cls = 'r', base = 0, step = 0 } = {}) =>
+  const mark = (sel, { scope = document, cls = 'r', base = 0, step = 0, soft = false } = {}) =>
     scope.querySelectorAll(sel).forEach((el, i) => {
       el.classList.add(cls);
+      if (soft) el.classList.add('r-soft');
       if (base || step) el.style.setProperty('--mo-d', `${base + i * step}ms`);
       io.observe(el);
     });
 
-  mark('.section-top');
-  mark('.work .section-heading h2 .r-line, .work .section-heading h2 > span', { step: 90 });
+  mark('.work .section-heading h2 .r-line, .work .section-heading h2 > span', { step: 90, soft: true });
   mark('.work-intro', { base: 120 });
+  /* A card reveals as one object: artwork, then its text. */
   document.querySelectorAll('.project').forEach(p => {
     mark('.project-kicker', { scope: p });
-    mark('.project-image', { scope: p, cls: 'r-img', base: 60 });
-    mark('.project-heading', { scope: p, base: 150 });
-    mark('.project-description', { scope: p, base: 210 });
-    mark('.tags', { scope: p, base: 270 });
+    mark('.project-image', { scope: p, cls: 'r-img' });
+    mark('.project-heading, .project-description, .tags', { scope: p, base: 120 });
   });
   mark('.all-work');
   mark('.about-photo');
   mark('.about-copy', { base: 130 });
-  mark('.expertise h3');
+  mark('.expertise h3', { soft: true });
   mark('.skill-row', { base: 60, step: 90 });
-  mark('.experience h2');
+  mark('.experience h2', { soft: true });
   mark('.timeline article', { base: 80, step: 110 });
-  mark('.contact-main');
+  mark('.contact-main > p');
   mark('.contact-bottom', { base: 120 });
+
+  /* --- Line-masked display type: two deliberate moments --- */
+  const lineMask = el => {
+    if (!el) return;
+    /* Freeze the inherited colours first: wrapping breaks the direct-child
+       selectors the accent colours are written against. */
+    el.querySelectorAll('*').forEach(n => { n.style.color = getComputedStyle(n).color; });
+    const lines = [[]];
+    [...el.childNodes].forEach(n => n.nodeName === 'BR' ? lines.push([]) : lines[lines.length - 1].push(n));
+    el.textContent = '';
+    lines.forEach((nodes, i) => {
+      const outer = document.createElement('span'), inner = document.createElement('span');
+      outer.className = 'ln';
+      outer.style.setProperty('--ln-d', `${i * 90}ms`);
+      nodes.forEach(n => inner.appendChild(n));
+      outer.appendChild(inner);
+      el.appendChild(outer);
+    });
+    el.classList.add('lines');
+    io.observe(el);
+  };
+  lineMask(document.querySelector('.contact-main h2'));
+
+  /* --- One delighter, at the end of the page where it is earned --- */
+  const arrow = document.querySelector('.contact-arrow');
+  const zone = document.querySelector('.contact-main');
+  if (arrow && zone && matchMedia('(pointer: fine)').matches) {
+    const REACH = 130, MAX = 8;
+    zone.addEventListener('pointermove', e => {
+      const b = arrow.getBoundingClientRect();
+      const dx = e.clientX - (b.left + b.width / 2), dy = e.clientY - (b.top + b.height / 2);
+      const d = Math.hypot(dx, dy) || 1;
+      if (d > REACH) return void (arrow.style.transform = '');
+      const pull = MAX * (1 - d / REACH);
+      arrow.style.transform = `translate(${dx / d * pull}px,${dy / d * pull}px)`;
+    }, { passive: true });
+    zone.addEventListener('pointerleave', () => { arrow.style.transform = ''; });
+  }
 
   /* --- Opening sequence --- */
   if (!root.classList.contains('intro')) return;

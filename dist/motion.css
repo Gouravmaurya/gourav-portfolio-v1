@@ -1,6 +1,16 @@
-/* Motion layer. Opening sequence, scroll reveals, interaction polish.
-   Layout, colour, and type are untouched: every rule here only animates. */
-:root { --mo-ease: cubic-bezier(.62,0,.24,1); --mo-y: 22px; --mo-t: .6s; }
+/* Motion layer. Opening sequence, scroll reveals, scroll-driven polish.
+   Colour, type and content are untouched. The header is sticky; nothing else
+   about the layout moves. */
+:root {
+  --ease-out: cubic-bezier(.16,1,.3,1);   /* things arriving */
+  --ease-move: cubic-bezier(.62,0,.24,1); /* things repositioning */
+  --mo-y: 22px;
+  --mo-t: .5s;
+}
+
+/* Anchor jumps have to clear the sticky header (90px, 74px on phones). */
+html { scroll-padding-top: 104px; }
+@media (max-width: 600px) { html { scroll-padding-top: 88px; } }
 
 /* --- 1. Opening sequence: full-bleed portrait folds into the hero photo --- */
 /* html.intro is set by the inline head script, removed once the sequence ends. */
@@ -20,7 +30,7 @@
 .intro-reveal .hero-aside, .intro-reveal .hero-bottom, .intro-reveal .surname,
 .intro-reveal .hero-photo figcaption {
   opacity: 1; transform: none;
-  transition: opacity .55s var(--mo-ease) var(--mo-d,0ms), transform .55s var(--mo-ease) var(--mo-d,0ms);
+  transition: opacity .55s var(--ease-move) var(--mo-d,0ms), transform .55s var(--ease-move) var(--mo-d,0ms);
 }
 .intro-skip {
   position: fixed; right: 20px; bottom: 20px; z-index: 70;
@@ -30,33 +40,101 @@
 }
 .intro-skip:hover { background: var(--ink); }
 
-/* --- 2. Scroll reveals: once, on enter, and they stay --- */
+/* --- 2. Sticky header: frosts as soon as the page leaves the top --- */
+/* The frost is not decoration: once content scrolls under a transparent header
+   the nav becomes unreadable, so this runs under reduced motion too. */
+.nav { position: sticky; top: 0; z-index: 50; }
+.nav::before {
+  content: ''; position: absolute; top: 0; bottom: -1px; left: -4.35%; right: -4.35%;
+  z-index: -1; opacity: 0;
+  background: color-mix(in srgb, var(--paper) 78%, transparent);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  transition: opacity .18s var(--ease-out);
+}
+.stuck .nav::before { opacity: 1; }
+@media (max-width: 600px) { .nav::before { left: -6.82%; right: -6.82%; } }
+
+/* --- 3. Scroll reveals: once, on enter, and they stay --- */
 .r, .r-img {
   opacity: 0; transform: translateY(var(--mo-y));
-  transition: opacity var(--mo-t) var(--mo-ease) var(--mo-d,0ms), transform var(--mo-t) var(--mo-ease) var(--mo-d,0ms);
+  transition: opacity var(--mo-t) var(--ease-out) var(--mo-d,0ms),
+              transform var(--mo-t) var(--ease-out) var(--mo-d,0ms),
+              filter var(--mo-t) var(--ease-out) var(--mo-d,0ms);
 }
-.r-img { --mo-t: .7s; transform: translateY(calc(var(--mo-y) * .75)) scale(.985); }
-.r.in, .r-img.in { opacity: 1; transform: none; }
+.r-img { --mo-t: .6s; }
+/* Display headings come into focus instead of sliding. Kept to a handful of
+   small elements — blur over a large area is expensive. */
+.r-soft { filter: blur(6px); }
+.r.in, .r-img.in { opacity: 1; transform: none; filter: none; }
 /* "SELECTED" needs its own box to rise in; it must not pick up the "WORK" accent. */
 .work .section-heading h2 > .r-line { color: inherit; display: inline-block; }
 
-/* --- 3. Interaction polish --- */
+/* --- 4. Line-masked display type: the one deliberate moment --- */
+/* Masks a <br>-separated run, so it only suits display type that cannot wrap. */
+/* Slack at the top for accents; descenders get padding instead of clip slack,
+   cancelled by the negative margin, so the mask sits flush with the box and a
+   wrapped line cannot peek out below it. */
+.lines .ln {
+  display: block; font-style: normal;
+  padding-bottom: .12em; margin-bottom: -.12em;
+  clip-path: inset(-.35em 0 0 0);
+}
+.lines .ln > span { display: block; transform: translateY(118%); transition: transform .7s var(--ease-out) var(--ln-d,0ms); }
+.lines.in .ln > span { transform: none; }
+/* The wrapper lands as a direct child, where the accent rule would catch it. */
+.contact-main h2 > .ln { color: inherit; }
+
+/* --- 5. Scroll-driven: continuous, reversible, off the main thread --- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Photographs settle across their whole pass through the viewport, so they
+       are alive the entire time they are on screen rather than for 600ms. */
+    .about-photo img { --settle: 1.08; }
+    .work .project-image img { --settle: 1.04; }
+    .about-photo img, .work .project-image img {
+      animation: mo-settle linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 55%;
+    }
+    /* The card clips its artwork, and an overflow:hidden box counts as a scroll
+       container — view() inside one resolves against the card and never moves.
+       Name the timeline on the card itself so it tracks the page instead. */
+    .work .project-image { view-timeline: --mo-art block; }
+    .work .project-image img { animation-timeline: --mo-art; }
+    @keyframes mo-settle { from { scale: var(--settle) } to { scale: 1 } }
+
+    /* The two display words drift apart as the hero leaves. */
+    html:not(.intro) #hero-title, html:not(.intro) .surname {
+      animation: mo-drift linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+    html:not(.intro) #hero-title { --drift: -40px; }
+    html:not(.intro) .surname { --drift: 24px; }
+    @keyframes mo-drift { to { transform: translateY(var(--drift)) } }
+  }
+}
+
+/* --- 6. Interaction polish --- */
 .line-link, .resume, .nav-contact, .email, .work .work-intro a, .nav nav > a { position: relative; }
 .line-link::after, .resume::after, .nav-contact::after, .email::after,
 .work .work-intro a::after, .nav nav > a::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
   background: currentColor; transform: scaleX(0); transform-origin: left;
-  transition: transform .35s var(--mo-ease);
+  transition: transform .35s var(--ease-out);
 }
 .nav nav > a:not(.nav-contact)::after { bottom: 9px; }
+/* The nav is looked at constantly — it gets the fast version. */
+.nav nav > a::after { transition-duration: .15s; }
 .line-link:hover::after, .resume:hover::after, .nav-contact:hover::after, .email:hover::after,
 .work .work-intro a:hover::after, .nav nav > a:hover::after { transform: scaleX(1); }
 .line-link > span, .resume > span, .nav-contact > span, .work .work-intro a > span,
-#copy-email > span, .contact-arrow { transition: transform .25s var(--mo-ease); }
+#copy-email > span { transition: transform .25s var(--ease-out); }
 .resume:hover > span, .nav-contact:hover > span, .work .work-intro a:hover > span,
 #copy-email:hover > span { transform: translate(3px,-3px); }
 .line-link:hover > span { transform: translate(3px,3px); }
-.contact-arrow:hover { transform: translate(4px,-4px); }
+/* Magnetic pull is driven from script.js; this is the release. */
+.contact-arrow { transition: transform .35s var(--ease-out); }
 
-/* --- 4. Shorter travel on phones --- */
-@media (max-width: 600px) { :root { --mo-y: 14px; --mo-t: .5s; } }
+/* --- 7. Shorter travel on phones --- */
+@media (max-width: 600px) { :root { --mo-y: 14px; } }
