@@ -25,7 +25,8 @@ Open http://localhost:4173.
 - `dist/index.html`: page content
 - `dist/style.css`: base styling
 - `dist/selected-work.css`: Selected Work styling
-- `dist/script.js`: copy-email interaction
+- `dist/motion.css`: opening sequence, scroll reveals, hover transitions
+- `dist/script.js`: copy-email interaction, opening sequence, scroll reveals
 - `dist/assets/`: photos, project images, and résumé
 - `.openai/hosting.json`: existing Sites deployment configuration
 

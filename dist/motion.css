@@ -1,0 +1,62 @@
+/* Motion layer. Opening sequence, scroll reveals, interaction polish.
+   Layout, colour, and type are untouched: every rule here only animates. */
+:root { --mo-ease: cubic-bezier(.62,0,.24,1); --mo-y: 22px; --mo-t: .6s; }
+
+/* --- 1. Opening sequence: full-bleed portrait folds into the hero photo --- */
+/* html.intro is set by the inline head script, removed once the sequence ends. */
+.intro .hero-photo { z-index: 60; will-change: clip-path; }
+.intro .hero-photo img { transform-origin: 0 0; will-change: transform; }
+.intro:not(.intro-go) .hero-photo { opacity: 0; }
+.intro .nav, .intro .hero-top, .intro #hero-title, .intro .hero-intro, .intro .hero-aside,
+.intro .hero-bottom, .intro .surname, .intro .hero-photo figcaption { opacity: 0; }
+.intro #hero-title, .intro .hero-intro, .intro .hero-aside, .intro .surname { transform: translateY(20px); }
+.intro .hero-top { --mo-d: 50ms; }
+.intro #hero-title { --mo-d: 110ms; }
+.intro .hero-intro { --mo-d: 190ms; }
+.intro .hero-aside, .intro .hero-photo figcaption { --mo-d: 250ms; }
+.intro .hero-bottom { --mo-d: 310ms; }
+.intro .surname { --mo-d: 380ms; }
+.intro-reveal .nav, .intro-reveal .hero-top, .intro-reveal #hero-title, .intro-reveal .hero-intro,
+.intro-reveal .hero-aside, .intro-reveal .hero-bottom, .intro-reveal .surname,
+.intro-reveal .hero-photo figcaption {
+  opacity: 1; transform: none;
+  transition: opacity .55s var(--mo-ease) var(--mo-d,0ms), transform .55s var(--mo-ease) var(--mo-d,0ms);
+}
+.intro-skip {
+  position: fixed; right: 20px; bottom: 20px; z-index: 70;
+  padding: 11px 16px; border: 1px solid #ffffff4d; background: #23231fb3; color: #eeeae1;
+  font: 500 12px/1 var(--sans); letter-spacing: 1.4px; cursor: pointer;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.intro-skip:hover { background: var(--ink); }
+
+/* --- 2. Scroll reveals: once, on enter, and they stay --- */
+.r, .r-img {
+  opacity: 0; transform: translateY(var(--mo-y));
+  transition: opacity var(--mo-t) var(--mo-ease) var(--mo-d,0ms), transform var(--mo-t) var(--mo-ease) var(--mo-d,0ms);
+}
+.r-img { --mo-t: .7s; transform: translateY(calc(var(--mo-y) * .75)) scale(.985); }
+.r.in, .r-img.in { opacity: 1; transform: none; }
+/* "SELECTED" needs its own box to rise in; it must not pick up the "WORK" accent. */
+.work .section-heading h2 > .r-line { color: inherit; display: inline-block; }
+
+/* --- 3. Interaction polish --- */
+.line-link, .resume, .nav-contact, .email, .work .work-intro a, .nav nav > a { position: relative; }
+.line-link::after, .resume::after, .nav-contact::after, .email::after,
+.work .work-intro a::after, .nav nav > a::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform .35s var(--mo-ease);
+}
+.nav nav > a:not(.nav-contact)::after { bottom: 9px; }
+.line-link:hover::after, .resume:hover::after, .nav-contact:hover::after, .email:hover::after,
+.work .work-intro a:hover::after, .nav nav > a:hover::after { transform: scaleX(1); }
+.line-link > span, .resume > span, .nav-contact > span, .work .work-intro a > span,
+#copy-email > span, .contact-arrow { transition: transform .25s var(--mo-ease); }
+.resume:hover > span, .nav-contact:hover > span, .work .work-intro a:hover > span,
+#copy-email:hover > span { transform: translate(3px,-3px); }
+.line-link:hover > span { transform: translate(3px,3px); }
+.contact-arrow:hover { transform: translate(4px,-4px); }
+
+/* --- 4. Shorter travel on phones --- */
+@media (max-width: 600px) { :root { --mo-y: 14px; --mo-t: .5s; } }
