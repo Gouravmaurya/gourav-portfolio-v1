@@ -44,6 +44,46 @@ html { scroll-padding-top: 104px; }
 /* "SELECTED" needs its own box to rise in; it must not pick up the "WORK" accent. */
 .work .section-heading h2 > .r-line { color: inherit; display: inline-block; }
 
+/* --- Pinned horizontal work stage --- */
+/* This query is mirrored character-for-character in motion.js, so the layout and
+   the ScrollTrigger that drives it can never disagree about which mode we are in.
+   The min-height guard matters: the whole section has to fit one viewport while
+   pinned, and on a short laptop screen it does not — there it stays vertical. */
+@media (min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  .work {
+    height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center;
+    padding-top: 0; padding-bottom: 0;
+  }
+  /* motion.js moves .section-heading into the track as its first panel. Stacking
+     it above instead would make the heading and the artwork compete for the same
+     one-viewport height budget, which forces the display type down on any normal
+     laptop. As a panel it keeps its size and simply scrolls away with the work. */
+  .work .project-grid > .section-heading {
+    flex: 0 0 auto; width: min(44vw, 540px);
+    display: block; margin: 0; align-self: center;
+  }
+  .work .project-grid > .section-heading h2 { font-size: clamp(60px, 7vw, 120px); }
+  .work .project-grid > .section-heading .work-intro {
+    max-width: none; margin-top: 22px; padding-bottom: 0;
+  }
+  .work .project-grid {
+    display: flex; flex-wrap: nowrap; align-items: start;
+    width: max-content; gap: 5vw;
+    will-change: transform;
+  }
+  /* Fixed panel widths keep the track's measured width independent of when the
+     lazy artwork finishes loading. */
+  .work .project { flex: 0 0 auto; width: min(40vw, 470px); margin: 0; }
+  .work .project-wide { width: min(56vw, 700px); }
+  .work .project-kicker { padding-bottom: 10px; }
+  .work .project-heading { padding-top: 14px; }
+  .work .project-wide .project-heading { padding-top: 14px; }
+  .work .project-description { margin-top: 12px; }
+  .work .tags { margin-top: 12px; }
+  .work .all-work { margin-top: 18px; padding-top: 16px; }
+}
+
 /* --- 3. Interaction polish (CSS: it needs no library) --- */
 .line-link, .resume, .nav-contact, .email, .work .work-intro a, .nav nav > a { position: relative; }
 .line-link::after, .resume::after, .nav-contact::after, .email::after,

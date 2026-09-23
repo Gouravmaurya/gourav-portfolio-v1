@@ -21,6 +21,9 @@
   /* Lenis wraps the real window scroll, so position:sticky and IntersectionObserver
      keep working and ScrollTrigger needs no scrollerProxy — just this sync. */
   const lenis = new Lenis({ autoRaf: false, duration: 1.05 });
+  /* Exposed deliberately: smooth scroll is polarising, and this is the handle
+     for turning it off — lenis.destroy() restores native scrolling outright. */
+  window.lenis = lenis;
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -138,36 +141,30 @@
      pinned, scrubbed page. */
   const mm = gsap.matchMedia();
 
-  mm.add('(prefers-reduced-motion: no-preference)', () => {
-    const rise = (targets, opts = {}) => {
-      const els = gsap.utils.toArray(targets);
-      if (!els.length) return;
-      const y = innerWidth <= 600 ? 14 : 22;
-      gsap.set(els, { opacity: 0, y, ...(opts.setVars || {}) });
-      ScrollTrigger.batch(els, {
-        start: 'top 92%',
-        once: true,
-        onEnter: batch => gsap.to(batch, {
-          opacity: 1, y: 0, filter: 'blur(0px)',
-          duration: opts.duration || .5,
-          stagger: opts.stagger != null ? opts.stagger : .09,
-          ease: 'power3.out',
-          overwrite: true,
-        }),
-      });
-    };
-
-    /* Display headings come into focus rather than sliding. */
-    const soft = { setVars: { filter: 'blur(6px)' } };
-
-    rise('.work .section-heading h2 .r-line, .work .section-heading h2 > span', soft);
-    rise('.work-intro');
-    document.querySelectorAll('.project').forEach(p => {
-      /* A card reveals as one object: artwork, then its text. */
-      rise([p.querySelector('.project-kicker'), p.querySelector('.project-image')].filter(Boolean), { stagger: .06 });
-      rise(p.querySelectorAll('.project-heading, .project-description, .tags'), { stagger: 0 });
+  /* Shared by every context below, so it lives outside them. Each call is still
+     created inside whichever matchMedia scope invokes it, and is reverted with it. */
+  const rise = (targets, opts = {}) => {
+    const els = gsap.utils.toArray(targets);
+    if (!els.length) return;
+    const y = innerWidth <= 600 ? 14 : 22;
+    gsap.set(els, { opacity: 0, y, ...(opts.setVars || {}) });
+    ScrollTrigger.batch(els, {
+      start: 'top 92%',
+      once: true,
+      onEnter: batch => gsap.to(batch, {
+        opacity: 1, y: 0, filter: 'blur(0px)',
+        duration: opts.duration || .5,
+        stagger: opts.stagger != null ? opts.stagger : .09,
+        ease: 'power3.out',
+        overwrite: true,
+      }),
     });
-    rise('.all-work');
+  };
+
+  /* Display headings come into focus rather than sliding. */
+  const soft = { setVars: { filter: 'blur(6px)' } };
+
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
     rise('.about-photo');
     rise('.about-copy');
     rise('.expertise h3', soft);
@@ -179,5 +176,66 @@
     rise('.contact-bottom');
     /* No cleanup function needed: gsap.matchMedia() reverts every tween and
        ScrollTrigger created inside this scope when the query stops matching. */
+  });
+
+  /* --- The work section: horizontal when there is room, vertical otherwise --- */
+  /* HORIZ is the same string as the media query in motion.css. Keep them identical:
+     if the CSS says "track" and the JS says "stack", the section breaks. */
+  const HORIZ = '(min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)';
+  const VERT = '(prefers-reduced-motion: no-preference) and ((max-width: 899px) or (max-height: 699px))';
+
+  mm.add(HORIZ, () => {
+    const section = document.querySelector('.work');
+    const track = section && section.querySelector('.project-grid');
+    if (!track) return;
+
+    /* The heading becomes the track's first panel — see the note in motion.css.
+       The cleanup puts it back, so switching modes restores the original order. */
+    const heading = section.querySelector('.section-heading');
+    if (heading) track.prepend(heading);
+
+    /* The track lives inside the section's padding, so the distance it has to
+       travel is its own width minus the room the section actually gives it —
+       that is what makes the last panel land flush instead of short or past. */
+    const room = () => {
+      const cs = getComputedStyle(section);
+      return section.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    };
+    const distance = () => Math.max(0, track.scrollWidth - room());
+
+    gsap.to(track, {
+      x: () => -distance(),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: () => '+=' + distance(),
+        pin: true,
+        /* transform rather than position:fixed — the documented pin type for
+           smooth-scroll setups, and it keeps the pinned stage in the same
+           compositing world as the rest of the Lenis-driven page. */
+        pinType: 'transform',
+        scrub: .6,
+        anticipatePin: 1,
+        /* Re-measure on resize rather than baking in the load-time width. */
+        invalidateOnRefresh: true,
+      },
+    });
+
+    return () => { if (heading) section.insertBefore(heading, track); };
+  });
+
+  /* Every reveal inside .work is vertical-mode only. Once the section is pinned it
+     stops moving through the viewport, so a batch trigger measured against it
+     never fires and its target would stay at opacity 0 forever. In horizontal
+     mode the sideways travel is the reveal. */
+  mm.add(VERT, () => {
+    rise('.work .section-heading h2 .r-line, .work .section-heading h2 > span', soft);
+    rise('.work-intro');
+    rise('.all-work');
+    document.querySelectorAll('.project').forEach(p => {
+      rise([p.querySelector('.project-kicker'), p.querySelector('.project-image')].filter(Boolean), { stagger: .06 });
+      rise(p.querySelectorAll('.project-heading, .project-description, .tags'), { stagger: 0 });
+    });
   });
 })();
