@@ -178,24 +178,38 @@
   const REDUCED = '(prefers-reduced-motion: reduce)';
   const mm = gsap.matchMedia();
 
-  /* Shared by every context below, so it lives outside them. Each call is still
-     created inside whichever matchMedia scope invokes it, and is reverted with it. */
+  /* Reveals are detected with IntersectionObserver, not ScrollTrigger.
+     ScrollTrigger keeps a trigger's start as a document position, and pinning the
+     work section inserts a spacer as tall as its travel, which shifts everything
+     below it — the reveals are registered before that spacer exists, so their
+     positions ended up stale by exactly the pin distance and elements either
+     fired far too early or never fired at all, leaving real content invisible.
+     IO reads actual geometry, so it cannot drift. ScrollTrigger is still the
+     right tool for the pin, the scrub, the panel travel and the colour morph;
+     it just should not be the thing deciding "is this on screen yet". */
+  const seen = new WeakMap();
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    io.unobserve(e.target);
+    const play = seen.get(e.target);
+    if (play) { seen.delete(e.target); play(); }
+  }), { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+
+  const onVisible = (el, play) => { seen.set(el, play); io.observe(el); };
+
   const rise = (targets, opts = {}) => {
     const els = gsap.utils.toArray(targets);
     if (!els.length) return;
     const y = innerWidth <= 600 ? 14 : 22;
     gsap.set(els, { opacity: 0, y, ...(opts.setVars || {}) });
-    ScrollTrigger.batch(els, {
-      start: 'top 92%',
-      once: true,
-      onEnter: batch => gsap.to(batch, {
-        opacity: 1, y: 0, filter: 'blur(0px)',
-        duration: opts.duration || .5,
-        stagger: opts.stagger != null ? opts.stagger : .09,
-        ease: 'power3.out',
-        overwrite: true,
-      }),
-    });
+    const step = opts.stagger != null ? opts.stagger : .09;
+    els.forEach((el, i) => onVisible(el, () => gsap.to(el, {
+      opacity: 1, y: 0, filter: 'blur(0px)',
+      duration: opts.duration || .5,
+      delay: i * step,
+      ease: 'power3.out',
+      overwrite: true,
+    })));
   };
 
   /* Display headings come into focus rather than sliding. */
@@ -220,23 +234,23 @@
     el.setAttribute('aria-label', label);
     gsap.set(el, { opacity: 1 });
     gsap.set(split.words, { opacity: 0, yPercent: 55, display: 'inline-block' });
-    ScrollTrigger.create({
-      trigger: el, start: 'top 88%', once: true,
-      onEnter: () => gsap.to(split.words, {
-        opacity: 1, yPercent: 0, duration: .7, ease: 'power3.out', stagger: .045,
-      }),
-    });
+    onVisible(el, () => gsap.to(split.words, {
+      opacity: 1, yPercent: 0, duration: .7, ease: 'power3.out', stagger: .045,
+    }));
     return true;
   };
 
   /* Artwork wipes open instead of fading, which suits printed work better than
      a dissolve and matches how the portrait resolves. */
-  const wipe = (els, start = 'top 85%') => gsap.utils.toArray(els).forEach(el => {
+  const wipe = els => gsap.utils.toArray(els).forEach(el => {
     gsap.set(el, { clipPath: 'inset(0 0 100% 0)' });
-    ScrollTrigger.create({
-      trigger: el, start, once: true,
-      onEnter: () => gsap.to(el, { clipPath: 'inset(0 0 0% 0)', duration: .95, ease: 'power3.inOut' }),
-    });
+    /* Observe the parent, never the clipped element itself. IntersectionObserver
+       measures the area left after clipping, and inset(0 0 100%) leaves exactly
+       zero of it — so a clipped element can never cross a threshold and would
+       sit invisible forever, hidden from the very observer meant to reveal it. */
+    onVisible(el.parentElement || el, () => gsap.to(el, {
+      clipPath: 'inset(0 0 0% 0)', duration: .95, ease: 'power3.inOut',
+    }));
   });
 
   mm.add(MOTION_OK, () => {
@@ -366,11 +380,19 @@
     ].join(', '));
     if (!els.length) return;
     gsap.set(els, { opacity: 0 });
-    ScrollTrigger.batch(els, {
-      start: 'top 92%', once: true,
-      onEnter: batch => gsap.to(batch, { opacity: 1, duration: .35, stagger: .04, ease: 'none', overwrite: true }),
-    });
+    els.forEach(el => onVisible(el, () => gsap.to(el, { opacity: 1, duration: .35, ease: 'none', overwrite: true })));
   });
+
+  /* --- Recompute every trigger position once the pin exists ---------------- */
+  /* A trigger's start/end is a document position, and pinning the work section
+     inserts a spacer as tall as its travel — roughly a thousand pixels — which
+     moves everything below it down. The reveals are registered before that
+     spacer exists, so without this refresh their positions are stale by exactly
+     the pin distance: .about-copy would fire at 1476 instead of 2549, while it
+     is still far below the fold. The load handler covers the same problem
+     caused by images settling later. */
+  ScrollTrigger.refresh();
+  addEventListener('load', () => ScrollTrigger.refresh());
 
   /* --- A cursor ring that trails the real one ----------------------------- */
   /* Motion's job is spring physics. The native cursor is deliberately left
