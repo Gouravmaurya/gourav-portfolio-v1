@@ -55,7 +55,6 @@
   };
 
   if (runIntro) {
-    try { sessionStorage.introSeen = '1'; } catch {}
 
     const HOLD = 0.3, DUR = 0.98;
     let skipBtn = null, tl = null, over = false;
@@ -285,7 +284,7 @@
     };
     const distance = () => Math.max(0, track.scrollWidth - room());
 
-    gsap.to(track, {
+    const travel = gsap.to(track, {
       x: () => -distance(),
       ease: 'none',
       scrollTrigger: {
@@ -302,6 +301,22 @@
         /* Re-measure on resize rather than baking in the load-time width. */
         invalidateOnRefresh: true,
       },
+    });
+
+    /* Each panel arrives as it travels in, rather than the whole track simply
+       sliding. Without this the entire work section had no entrance of its own
+       on a wide screen — the sideways movement was doing all the work — so a
+       desktop visitor saw nothing animate between the hero and About.
+       containerAnimation is what lets a trigger fire on horizontal travel
+       instead of on page scroll. */
+    gsap.utils.toArray(track.children).forEach(panel => {
+      gsap.from(panel, {
+        opacity: 0, y: 34, duration: .6, ease: 'power3.out',
+        scrollTrigger: {
+          trigger: panel, containerAnimation: travel,
+          start: 'left 92%', once: true,
+        },
+      });
     });
 
     return () => { if (heading) section.insertBefore(heading, track); };
