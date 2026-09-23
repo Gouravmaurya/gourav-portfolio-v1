@@ -171,6 +171,12 @@
      *{transition:none} reduced-motion rule does NOT cover GSAP tweens, so this
      matchMedia is the only thing standing between a reduced-motion user and a
      pinned, scrubbed page. */
+  /* MOTION_OK fails open on purpose. A browser that does not know this feature
+     reports false for BOTH 'reduce' and 'no-preference', so gating on
+     no-preference turns every animation off silently — which is exactly how a
+     page ends up with no reveals anywhere and no error to show for it. */
+  const MOTION_OK = '(not (prefers-reduced-motion: reduce))';
+  const REDUCED = '(prefers-reduced-motion: reduce)';
   const mm = gsap.matchMedia();
 
   /* Shared by every context below, so it lives outside them. Each call is still
@@ -196,29 +202,58 @@
   /* Display headings come into focus rather than sliding. */
   const soft = { setVars: { filter: 'blur(6px)' } };
 
-  mm.add('(prefers-reduced-motion: no-preference)', () => {
+  /* The editorial statements arrive word by word. SplitText re-splits on resize
+     and keeps the nested accent spans intact, and it contributes an aria-label
+     so the heading still reads as one phrase after being cut into spans.
+     Three treatments, by role: statements set in words, images wipe, body text
+     rises. A system, rather than the same entrance on everything. */
+  const words = sel => {
+    const el = document.querySelector(sel);
+    if (!el || !SplitText) return false;
+    /* SplitText derives its aria-label from textContent, where a <br> contributes
+       no character — "LET'S MAKE" + "IT MATTER." is then announced as
+       "MAKEIT". Rebuild the label with the line break as a space and set it
+       after the split, so it wins. */
+    const tmp = document.createElement('div');
+    tmp.innerHTML = el.innerHTML.replace(/<br\s*\/?>/gi, ' ');
+    const label = tmp.textContent.replace(/\s+/g, ' ').trim();
+    const split = new SplitText(el, { type: 'words' });
+    el.setAttribute('aria-label', label);
+    gsap.set(el, { opacity: 1 });
+    gsap.set(split.words, { opacity: 0, yPercent: 55, display: 'inline-block' });
+    ScrollTrigger.create({
+      trigger: el, start: 'top 88%', once: true,
+      onEnter: () => gsap.to(split.words, {
+        opacity: 1, yPercent: 0, duration: .7, ease: 'power3.out', stagger: .045,
+      }),
+    });
+    return true;
+  };
+
+  /* Artwork wipes open instead of fading, which suits printed work better than
+     a dissolve and matches how the portrait resolves. */
+  const wipe = (els, start = 'top 85%') => gsap.utils.toArray(els).forEach(el => {
+    gsap.set(el, { clipPath: 'inset(0 0 100% 0)' });
+    ScrollTrigger.create({
+      trigger: el, start, once: true,
+      onEnter: () => gsap.to(el, { clipPath: 'inset(0 0 0% 0)', duration: .95, ease: 'power3.inOut' }),
+    });
+  });
+
+  mm.add(MOTION_OK, () => {
     /* The portrait wipes rather than rises. Giving every section the same
        entrance is what makes a page read as animated-by-default instead of
        authored, so this half of the page gets one moment of its own — and
        clip-path is as cheap to composite as the transform it replaces. */
-    const portrait = document.querySelector('.about-photo img');
-    if (portrait) {
-      gsap.set(portrait, { clipPath: 'inset(0 0 100% 0)' });
-      ScrollTrigger.create({
-        trigger: '.about-photo', start: 'top 85%', once: true,
-        onEnter: () => gsap.to(portrait, {
-          clipPath: 'inset(0 0 0% 0)', duration: 1.1, ease: 'power3.inOut',
-        }),
-      });
-    }
+    wipe('.about-photo img');
 
     rise('.about-copy');
-    rise('.expertise h3', soft);
+    if (!words('.expertise h3')) rise('.expertise h3', soft);
     rise('.skill-row');
-    rise('.experience h2', soft);
+    if (!words('.experience h2')) rise('.experience h2', soft);
     rise('.timeline article');
     rise('.contact-main > p');
-    rise('.contact-main h2', soft);
+    if (!words('.contact-main h2')) rise('.contact-main h2', soft);
     /* .contact-bottom and .all-work deliberately do not animate: utility rows
        are furniture, and furniture that moves is noise. */
     /* No cleanup function needed: gsap.matchMedia() reverts every tween and
@@ -228,8 +263,8 @@
   /* --- The work section: horizontal when there is room, vertical otherwise --- */
   /* HORIZ is the same string as the media query in motion.css. Keep them identical:
      if the CSS says "track" and the JS says "stack", the section breaks. */
-  const HORIZ = '(min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference)';
-  const VERT = '(prefers-reduced-motion: no-preference) and ((max-width: 899px) or (max-height: 699px))';
+  const HORIZ = `(min-width: 900px) and (min-height: 700px) and ${MOTION_OK}`;
+  const VERT = `${MOTION_OK} and ((max-width: 899px) or (max-height: 699px))`;
 
   mm.add(HORIZ, () => {
     const section = document.querySelector('.work');
@@ -290,7 +325,7 @@
      finishes while the section is still mostly below the fold (top 78%): its
      text is paper-coloured and would be unreadable against a mid-transition
      background. */
-  mm.add('(prefers-reduced-motion: no-preference)', () => {
+  mm.add(MOTION_OK, () => {
     const paper = getComputedStyle(document.body).backgroundColor;
     document.querySelectorAll('.dark').forEach(sec => {
       gsap.fromTo(sec,
@@ -303,12 +338,31 @@
     });
   });
 
+  /* --- Reduced motion still resolves ---------------------------------------- */
+  /* The preference is about movement, not about every visual change: WCAG 2.3.3
+     scopes itself to motion animation and excludes fades. So instead of a page
+     where nothing ever resolves, these fade — no travel, no blur, no pin, no
+     parallax, no smooth scroll, no cursor. */
+  mm.add(REDUCED, () => {
+    const els = gsap.utils.toArray([
+      '.work .section-heading', '.work-intro', '.project-image', '.project-heading',
+      '.project-description', '.tags', '.about-photo', '.about-copy', '.expertise h3',
+      '.skill-row', '.experience h2', '.timeline article', '.contact-main > p', '.contact-main h2',
+    ].join(', '));
+    if (!els.length) return;
+    gsap.set(els, { opacity: 0 });
+    ScrollTrigger.batch(els, {
+      start: 'top 92%', once: true,
+      onEnter: batch => gsap.to(batch, { opacity: 1, duration: .35, stagger: .04, ease: 'none', overwrite: true }),
+    });
+  });
+
   /* --- A cursor ring that trails the real one ----------------------------- */
   /* Motion's job is spring physics. The native cursor is deliberately left
      visible — this rides alongside rather than replacing it, so nobody loses the
      pointer they rely on. Fine pointers only, never under reduced motion. */
   if (window.Motion && matchMedia('(pointer: fine)').matches
-      && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+      && matchMedia(MOTION_OK).matches) {
     const { animate } = window.Motion;
     const ring = document.createElement('div');
     ring.className = 'cursor-ring';

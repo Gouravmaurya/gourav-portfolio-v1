@@ -49,7 +49,7 @@ html { scroll-padding-top: 104px; }
    the ScrollTrigger that drives it can never disagree about which mode we are in.
    The min-height guard matters: the whole section has to fit one viewport while
    pinned, and on a short laptop screen it does not — there it stays vertical. */
-@media (min-width: 900px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+@media (min-width: 900px) and (min-height: 700px) and (not (prefers-reduced-motion: reduce)) {
   .work {
     height: 100vh; overflow: hidden;
     display: flex; flex-direction: column; justify-content: center;
