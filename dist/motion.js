@@ -197,7 +197,21 @@
   const soft = { setVars: { filter: 'blur(6px)' } };
 
   mm.add('(prefers-reduced-motion: no-preference)', () => {
-    rise('.about-photo');
+    /* The portrait wipes rather than rises. Giving every section the same
+       entrance is what makes a page read as animated-by-default instead of
+       authored, so this half of the page gets one moment of its own — and
+       clip-path is as cheap to composite as the transform it replaces. */
+    const portrait = document.querySelector('.about-photo img');
+    if (portrait) {
+      gsap.set(portrait, { clipPath: 'inset(0 0 100% 0)' });
+      ScrollTrigger.create({
+        trigger: '.about-photo', start: 'top 85%', once: true,
+        onEnter: () => gsap.to(portrait, {
+          clipPath: 'inset(0 0 0% 0)', duration: 1.1, ease: 'power3.inOut',
+        }),
+      });
+    }
+
     rise('.about-copy');
     rise('.expertise h3', soft);
     rise('.skill-row');
@@ -205,7 +219,8 @@
     rise('.timeline article');
     rise('.contact-main > p');
     rise('.contact-main h2', soft);
-    rise('.contact-bottom');
+    /* .contact-bottom and .all-work deliberately do not animate: utility rows
+       are furniture, and furniture that moves is noise. */
     /* No cleanup function needed: gsap.matchMedia() reverts every tween and
        ScrollTrigger created inside this scope when the query stops matching. */
   });
@@ -264,7 +279,6 @@
   mm.add(VERT, () => {
     rise('.work .section-heading h2 .r-line, .work .section-heading h2 > span', soft);
     rise('.work-intro');
-    rise('.all-work');
     document.querySelectorAll('.project').forEach(p => {
       rise([p.querySelector('.project-kicker'), p.querySelector('.project-image')].filter(Boolean), { stagger: .06 });
       rise(p.querySelectorAll('.project-heading, .project-description, .tags'), { stagger: 0 });
