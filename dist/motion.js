@@ -56,7 +56,6 @@
 
   if (runIntro) {
     try { sessionStorage.introSeen = '1'; } catch {}
-    lenis.stop();
 
     const HOLD = 0.3, DUR = 0.98;
     let skipBtn = null, tl = null, over = false;
@@ -75,7 +74,15 @@
     const SKIP_ON = ['wheel', 'touchmove', 'keydown', 'pointerdown', 'resize'];
 
     const start = () => {
-      if (over || !root.classList.contains('intro')) return;
+      if (over) return;
+      /* Bail through finish(), never a bare return: the head script's 6s failsafe
+         may already have released the page — a tab left in the background stalls
+         rAF indefinitely — and the reader may have scrolled while the photo
+         decoded. Returning early here used to leave Lenis stopped forever, which
+         meant the page could not be scrolled at all. */
+      if (!root.classList.contains('intro') || scrollY > 0) return finish();
+      /* Only now is the sequence definitely running, so only now take the scroll. */
+      lenis.stop();
       const r = fig.getBoundingClientRect();
       const vw = innerWidth, vh = innerHeight;
       const iw = heroImg.naturalWidth, ih = heroImg.naturalHeight;
@@ -106,13 +113,33 @@
 
       root.classList.add('intro-go');
 
-      /* The hero settles in as the space opens. */
-      const stage = [
-        ['.nav', 0], ['.hero-top', .05], ['#hero-title', .11], ['.hero-intro', .19],
-        ['.hero-aside', .25], ['.hero-photo figcaption', .25], ['.hero-bottom', .31],
-        ['.surname', .38],
-      ];
       const settle = HOLD + DUR * .55;
+
+      /* The two display words arrive letter by letter. Splitting happens here,
+         after document.fonts.ready above, because character positions measured
+         against a fallback face would be wrong once the real one swaps in.
+         `ignore` keeps the visually-hidden full name out of the split. */
+      const letters = (sel, at, vars) => {
+        const el = document.querySelector(sel);
+        if (!el || !SplitText) return false;
+        const split = new SplitText(el, { type: 'chars', ...vars });
+        gsap.set(el, { opacity: 1, y: 0 });
+        tl.from(split.chars, {
+          opacity: 0, yPercent: 45, duration: .5, ease: 'power3.out', stagger: .035,
+        }, at);
+        return true;
+      };
+
+      const splitTitle = letters('#hero-title', settle + .11, { ignore: '.sr-only' });
+      const splitName = letters('.surname', settle + .38);
+
+      /* Everything the split did not take is revealed as a block. */
+      const stage = [
+        ['.nav', 0], ['.hero-top', .05], ['.hero-intro', .19],
+        ['.hero-aside', .25], ['.hero-photo figcaption', .25], ['.hero-bottom', .31],
+      ];
+      if (!splitTitle) stage.push(['#hero-title', .11]);
+      if (!splitName) stage.push(['.surname', .38]);
       stage.forEach(([sel, d]) => {
         const el = document.querySelector(sel);
         if (el) tl.to(el, { opacity: 1, y: 0, duration: .55, ease: 'power2.out' }, settle + d);
@@ -125,6 +152,11 @@
       skipBtn.addEventListener('click', finish);
       document.body.appendChild(skipBtn);
       SKIP_ON.forEach(t => addEventListener(t, finish, { passive: true }));
+
+      /* Hard release, on a timer rather than the ticker. GSAP runs on rAF, which
+         a backgrounded tab freezes outright — and this sequence holds the scroll
+         while it plays. If the timeline stalls, the page must not stay stuck. */
+      setTimeout(finish, (HOLD + DUR) * 1000 + 1500);
     };
 
     /* Wait for the photo and the display typefaces, not for a made-up timer. */
@@ -238,4 +270,46 @@
       rise(p.querySelectorAll('.project-heading, .project-description, .tags'), { stagger: 0 });
     });
   });
+
+  /* --- Section colour morph ----------------------------------------------- */
+  /* The dark sections rise out of the paper instead of hard-cutting. The morph
+     finishes while the section is still mostly below the fold (top 78%): its
+     text is paper-coloured and would be unreadable against a mid-transition
+     background. */
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    const paper = getComputedStyle(document.body).backgroundColor;
+    document.querySelectorAll('.dark').forEach(sec => {
+      gsap.fromTo(sec,
+        { backgroundColor: paper },
+        {
+          backgroundColor: getComputedStyle(sec).backgroundColor,
+          ease: 'none',
+          scrollTrigger: { trigger: sec, start: 'top bottom', end: 'top 78%', scrub: .5 },
+        });
+    });
+  });
+
+  /* --- A cursor ring that trails the real one ----------------------------- */
+  /* Motion's job is spring physics. The native cursor is deliberately left
+     visible — this rides alongside rather than replacing it, so nobody loses the
+     pointer they rely on. Fine pointers only, never under reduced motion. */
+  if (window.Motion && matchMedia('(pointer: fine)').matches
+      && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    const { animate } = window.Motion;
+    const ring = document.createElement('div');
+    ring.className = 'cursor-ring';
+    ring.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(ring);
+
+    const spring = { type: 'spring', stiffness: 520, damping: 34, mass: .5 };
+    addEventListener('pointermove', e => {
+      animate(ring, { x: e.clientX, y: e.clientY }, spring);
+    }, { passive: true });
+
+    const scaleTo = to => () => animate(ring, { scale: to }, { type: 'spring', bounce: 0, duration: .35 });
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('pointerenter', scaleTo(2.2));
+      el.addEventListener('pointerleave', scaleTo(1));
+    });
+  }
 })();

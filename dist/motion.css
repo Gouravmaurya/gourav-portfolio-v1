@@ -103,3 +103,14 @@ html { scroll-padding-top: 104px; }
 #copy-email:hover > span { transform: translate(3px,-3px); }
 .line-link:hover > span { transform: translate(3px,3px); }
 .contact-arrow { transition: transform .35s var(--ease-out); }
+
+/* --- Cursor ring (Motion springs; fine pointers only, added by motion.js) --- */
+/* difference blending is what makes it invert over the artwork. It never takes
+   pointer events, and the real cursor is left visible underneath. */
+.cursor-ring {
+  position: fixed; top: 0; left: 0; width: 26px; height: 26px;
+  margin: -13px 0 0 -13px; border: 1px solid var(--paper); border-radius: 50%;
+  pointer-events: none; z-index: 80; mix-blend-mode: difference;
+  will-change: transform;
+}
+@media (pointer: coarse), (prefers-reduced-motion: reduce) { .cursor-ring { display: none; } }

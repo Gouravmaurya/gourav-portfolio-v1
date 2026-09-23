@@ -12,7 +12,7 @@ An editorial portfolio for Anurag Maurya, print and digital media designer in tr
 
 ## Run locally
 
-This is a static website. No build step or dependency installation is required.
+This is a static website. No build step or dependency installation is required — the animation libraries are vendored in `dist/vendor/`.
 
 ```sh
 python -m http.server 4173 --directory dist
@@ -27,6 +27,8 @@ Open http://localhost:4173.
 - `dist/selected-work.css`: Selected Work styling
 - `dist/motion.css`: opening sequence, scroll reveals, hover transitions
 - `dist/script.js`: copy-email interaction, opening sequence, scroll reveals
+- `dist/motion.js`: opening sequence, scroll choreography, cursor
+- `dist/vendor/`: GSAP (+ScrollTrigger, SplitText), Lenis and Motion, vendored so the site has no third-party runtime dependency
 - `dist/assets/`: photos, project images, and résumé
 - `.openai/hosting.json`: existing Sites deployment configuration
 
