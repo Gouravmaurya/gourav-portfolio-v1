@@ -25,3 +25,7 @@ python -m http.server 4185 --directory dist
 Continue Gourav’s work on `gourav-maurya`. Preserve `anurags` and `main` independently. The two Anurag portraits are retained temporarily with the user’s approval until Gourav provides replacement photos. Haven uses a labeled project overview graphic; the social agent links to Gourav’s GitHub profile because a project-specific link was not supplied.
 
 No deployment was performed. Check the target before using the inherited hosting configuration. See `BRANCHES.md`.
+
+## Recent additions
+
+Formwork is the fourth project, represented by a labeled overview graphic until a live project link is supplied. Freelance AI work (June–July, two months) covers a RAG chatbot, bus/hotel/event booking orchestration, and trip planning; no year was specified. `interactions.css` and `interactions.js` provide highlighted, magnetic action links and the contact button. Pointer movement is disabled for reduced-motion and touch input; keyboard focus remains visible.

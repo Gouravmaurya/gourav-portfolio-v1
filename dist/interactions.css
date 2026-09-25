@@ -1,0 +1,22 @@
+/* Stable hit areas keep magnetic links easy to click. */
+.action-link { position:relative; isolation:isolate; min-height:48px; padding:15px 16px; border:1px solid currentColor; border-radius:2px; }
+.work .work-intro a.action-link { padding:15px 16px; border:1px solid #77776b; }
+.action-link::after { display:none; }
+.action-link::before { content:''; position:absolute; inset:0; background:currentColor; opacity:0; z-index:-1; transition:opacity 220ms cubic-bezier(.16,1,.3,1); }
+.action-link:hover::before,.action-link:focus-visible::before { opacity:.09; }
+.action-link:focus-visible,.contact-arrow:focus-visible { outline:2px solid currentColor; outline-offset:5px; }
+.action-link .magnet-content { display:flex; width:100%; justify-content:space-between; align-items:center; gap:20px; }
+[data-magnetic] > .magnet-content { transform:translate(var(--magnet-x,0px),var(--magnet-y,0px)); transition:transform 260ms cubic-bezier(.16,1,.3,1); pointer-events:none; }
+/* Override earlier arrow-hover transforms on this dedicated inner wrapper. */
+.action-link:hover > .magnet-content { transform:translate(var(--magnet-x,0px),var(--magnet-y,0px)); }
+.contact-arrow { position:relative; right:auto; bottom:auto; margin:28px 0 0 auto; width:128px; height:128px; font:inherit; background:#d7a68f; color:#191a17; border:1px solid #d7a68f; transition:background-color 200ms cubic-bezier(.16,1,.3,1); }
+.contact-arrow .magnet-content { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.contact-arrow svg { width:46px; height:46px; }
+.contact-arrow-label { font:600 10px/1.4 var(--sans); letter-spacing:1.8px; }
+.contact-arrow:hover { background:#eeeae1; }
+@media(max-width:600px) { .contact-arrow { width:96px; height:96px; margin-top:22px; } .contact-arrow svg { width:34px; height:34px; } .contact-arrow-label { font-size:9px; letter-spacing:1px; } }
+@media(prefers-reduced-motion:reduce) { [data-magnetic] > .magnet-content,.action-link:hover > .magnet-content { transform:none; transition:none; } .action-link::before,.contact-arrow { transition:none; } }
+
+/* Keep hero actions legible above the oversized decorative surname. */
+.hero-intro { position:relative; z-index:3; }
+.hero-intro .action-link { background:var(--paper); }
