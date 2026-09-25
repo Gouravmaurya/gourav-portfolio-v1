@@ -20,3 +20,12 @@
 /* Keep hero actions legible above the oversized decorative surname. */
 .hero-intro { position:relative; z-index:3; }
 .hero-intro .action-link { background:var(--paper); }
+
+/* Italiana has one native weight; a fine matching stroke adds a modest emphasis. */
+.hero-intro h2,
+.about-copy h2,
+.expertise h3,
+.experience-grid h2 {
+  -webkit-text-stroke: 0.28px currentColor;
+  paint-order: stroke fill;
+}
