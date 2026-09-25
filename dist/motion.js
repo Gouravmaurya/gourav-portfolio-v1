@@ -8,11 +8,6 @@
   const { gsap, ScrollTrigger, SplitText, Lenis } = window;
   const root = document.documentElement;
 
-  /* The sticky header needs its backdrop the moment the page leaves the top:
-     content under a transparent header is unreadable. That is legibility, not
-     decoration, so it is wired before any motion gate and never disabled. */
-  addEventListener('scroll', () => root.classList.toggle('stuck', scrollY > 4), { passive: true });
-
   if (!gsap || !ScrollTrigger || !Lenis) { root.classList.remove('intro'); return; }
   gsap.registerPlugin(ScrollTrigger);
   if (SplitText) gsap.registerPlugin(SplitText);
@@ -29,7 +24,9 @@
   gsap.ticker.lagSmoothing(0);
 
   /* Anchors route through Lenis so they land clear of the sticky header. */
-  const headerOffset = () => (innerWidth <= 600 ? 74 : 90) + 14;
+  /* The dock floats at the side (or the bottom on a phone), so an anchor only
+     needs a little breathing room rather than a header's height. */
+  const headerOffset = () => 24;
   document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
     const target = document.querySelector(a.getAttribute('href'));
     if (!target) return;
@@ -134,7 +131,7 @@
 
       /* Everything the split did not take is revealed as a block. */
       const stage = [
-        ['.nav', 0], ['.hero-top', .05], ['.hero-intro', .19],
+        ['.dock', 0], ['.hero-top', .05], ['.hero-intro', .19],
         ['.hero-aside', .25], ['.hero-photo figcaption', .25], ['.hero-bottom', .31],
       ];
       if (!splitTitle) stage.push(['#hero-title', .11]);

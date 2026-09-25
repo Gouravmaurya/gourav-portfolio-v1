@@ -7,8 +7,7 @@
 }
 
 /* Anchors go through Lenis in motion.js; this is the no-JS fallback. */
-html { scroll-padding-top: 104px; }
-@media (max-width: 600px) { html { scroll-padding-top: 88px; } }
+html { scroll-padding-top: 24px; }
 
 /* --- 1. Opening sequence: start state only, GSAP drives the rest --- */
 /* html.intro is set by the inline head script before first paint, and removed
@@ -16,7 +15,7 @@ html { scroll-padding-top: 104px; }
 .intro .hero-photo { z-index: 60; will-change: clip-path; }
 .intro .hero-photo img { will-change: transform; }
 .intro:not(.intro-go) .hero-photo { opacity: 0; }
-.intro .nav, .intro .hero-top, .intro #hero-title, .intro .hero-intro, .intro .hero-aside,
+.intro .dock, .intro .hero-top, .intro #hero-title, .intro .hero-intro, .intro .hero-aside,
 .intro .hero-bottom, .intro .surname, .intro .hero-photo figcaption { opacity: 0; }
 .intro #hero-title, .intro .hero-intro, .intro .hero-aside, .intro .surname { transform: translateY(20px); }
 .intro-skip {
@@ -27,19 +26,69 @@ html { scroll-padding-top: 104px; }
 }
 .intro-skip:hover { background: var(--ink); }
 
-/* --- 2. Sticky header: frosts as soon as the page leaves the top --- */
-/* Not decoration: content scrolling under a transparent header is unreadable,
-   so motion.js wires this before any reduced-motion gate. */
-.nav { position: sticky; top: 0; z-index: 50; }
-.nav::before {
-  content: ''; position: absolute; top: 0; bottom: -1px; left: -4.35%; right: -4.35%;
-  z-index: -1; opacity: 0;
-  background: color-mix(in srgb, var(--paper) 78%, transparent);
+/* --- 2. Left dock (replaces the top header) --- */
+/* Floats over the sections rather than taking a column of its own, so the dark
+   sections keep bleeding to the page edge and the pinned work stage's width
+   maths is untouched. Labels are set vertically — the same device the hero
+   figcaption already uses, and it keeps the dock narrow enough to sit in the
+   existing gutter. */
+.dock {
+  position: fixed; left: 16px; top: 50%; transform: translateY(-50%); z-index: 50;
+  display: flex; flex-direction: column; align-items: center; gap: 26px;
+  padding: 20px 11px;
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  transition: opacity .18s var(--ease-out);
+  border: 1px solid var(--line);
 }
-.stuck .nav::before { opacity: 1; }
-@media (max-width: 600px) { .nav::before { left: -6.82%; right: -6.82%; } }
+.dock-mark { font: 30px/1 var(--serif); letter-spacing: -5px; padding-right: 5px; }
+.dock-mark span { color: var(--accent); }
+.dock-links { display: flex; flex-direction: column; align-items: center; gap: 26px; }
+.dock-links a, .dock-contact {
+  position: relative; writing-mode: vertical-rl;
+  font-size: 13px; letter-spacing: 1.4px; padding: 2px 3px;
+  /* Vertical labels must not wrap: the dock is narrow along the block axis, so
+     a wrap breaks one label into two unreadable columns. */
+  white-space: nowrap;
+}
+.dock-links sup { color: var(--accent); font-size: 9px; margin-top: 4px; }
+.dock-contact { border-left: 1px solid var(--ink); padding-left: 9px; }
+.dock-contact > span { display: inline; }
+/* The underline runs with the text, so vertical labels get a vertical rule. */
+.dock-links a::after, .dock-contact::after {
+  content: ''; position: absolute; top: 0; bottom: 0; right: -4px; width: 1px;
+  background: currentColor; transform: scaleY(0); transform-origin: top;
+  transition: transform .18s var(--ease-out);
+}
+.dock-links a:hover::after, .dock-contact:hover::after { transform: scaleY(1); }
+
+/* Keep the dock clear of the content it floats over. */
+@media (min-width: 900px) {
+  :where(.work, .about, .experience, .contact) { padding-left: max(6%, 108px); }
+  .work { padding-left: max(6%, 108px); }
+  .hero { padding-left: max(4%, 108px); }
+}
+
+/* On a phone a left rail steals width and fights the thumb, so it docks to the
+   bottom and lies down. */
+@media (max-width: 899px) {
+  /* Pinned to both edges rather than centred on its own width: centring let the
+     bar grow wider than the viewport and hang off both sides. */
+  .dock {
+    left: 12px; right: 12px; top: auto; bottom: 14px; transform: none;
+    flex-direction: row; justify-content: space-between;
+    gap: 10px; padding: 9px 13px;
+  }
+  .dock-links { flex-direction: row; gap: 16px; }
+  .dock-links a, .dock-contact { writing-mode: horizontal-tb; font-size: 12px; }
+  .dock-mark { font-size: 24px; letter-spacing: -4px; padding-right: 4px; }
+  .dock-contact { border-left: 0; padding-left: 0; }
+  .dock-contact > span { display: inline; margin: 0 0 0 6px; }
+  .dock-links a::after, .dock-contact::after {
+    top: auto; bottom: -3px; left: 0; right: 0; width: auto; height: 1px;
+    transform: scaleX(0); transform-origin: left;
+  }
+  .dock-links a:hover::after, .dock-contact:hover::after { transform: scaleX(1); }
+}
 
 /* "SELECTED" needs its own box to rise in; it must not pick up the "WORK" accent. */
 .work .section-heading h2 > .r-line { color: inherit; display: inline-block; }
@@ -85,21 +134,18 @@ html { scroll-padding-top: 104px; }
 }
 
 /* --- 3. Interaction polish (CSS: it needs no library) --- */
-.line-link, .resume, .nav-contact, .email, .work .work-intro a, .nav nav > a { position: relative; }
-.line-link::after, .resume::after, .nav-contact::after, .email::after,
-.work .work-intro a::after, .nav nav > a::after {
+.line-link, .resume, .email, .work .work-intro a { position: relative; }
+.line-link::after, .resume::after, .email::after,
+.work .work-intro a::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
   background: currentColor; transform: scaleX(0); transform-origin: left;
   transition: transform .35s var(--ease-out);
 }
-.nav nav > a:not(.nav-contact)::after { bottom: 9px; }
-/* The nav is looked at constantly — it gets the fast version. */
-.nav nav > a::after { transition-duration: .15s; }
-.line-link:hover::after, .resume:hover::after, .nav-contact:hover::after, .email:hover::after,
-.work .work-intro a:hover::after, .nav nav > a:hover::after { transform: scaleX(1); }
-.line-link > span, .resume > span, .nav-contact > span, .work .work-intro a > span,
+.line-link:hover::after, .resume:hover::after, .email:hover::after,
+.work .work-intro a:hover::after { transform: scaleX(1); }
+.line-link > span, .resume > span, .work .work-intro a > span,
 #copy-email > span { transition: transform .25s var(--ease-out); }
-.resume:hover > span, .nav-contact:hover > span, .work .work-intro a:hover > span,
+.resume:hover > span, .work .work-intro a:hover > span,
 #copy-email:hover > span { transform: translate(3px,-3px); }
 .line-link:hover > span { transform: translate(3px,3px); }
 .contact-arrow { transition: transform .35s var(--ease-out); }
