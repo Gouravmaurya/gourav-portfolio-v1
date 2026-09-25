@@ -1,11 +1,13 @@
 # Portfolio branches
 
-- `anurags`: Anurag Maurya’s print and digital media design portfolio. Continue Anurag work on this branch.
-- `main`: Gourav Maurya’s developer portfolio, preserved independently.
-- `v1.0.0`: the original saved version before personalization.
+- `gourav-maurya`: Gourav Maurya’s full-stack AI engineering portfolio, based on `origin/anurags` at `7e6eee9`. Continue Gourav work in this checkout.
+- `anurags`: Anurag’s completed portfolio, preserved independently.
+- `main`: previous Gourav baseline, unchanged.
 
-The portraits supplied in the original brief belong to Anurag. They are named accordingly on `anurags`. Gourav’s `main` branch still has the original inherited portraits and needs Gourav’s own photographs before being treated as his finished portfolio.
+Content and the downloadable resume come from the supplied Gourav_Maurya_Resume -.pdf. The layout, styles, and animation scripts are inherited unchanged from Anurag’s completed version.
 
-Content for this branch comes from https://anurag-am.vercel.app/. The design remains the editorial layout developed in this repository.
+Portraits remain temporary reference photographs of Anurag until Gourav supplies his own. Do not represent them as photographs of Gourav.
 
-The inherited `.openai/hosting.json` points to Gourav’s existing private Site. Do not publish this branch to that Site or push it to `main`. Anurag needs a separate deployment target when publishing is requested.
+The Haven image is a project overview graphic, not a screenshot of its live interface. The social agent links to Gourav’s GitHub profile because no project-specific URL was supplied.
+
+Do not deploy automatically using inherited hosting configuration.

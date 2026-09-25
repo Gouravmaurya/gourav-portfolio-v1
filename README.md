@@ -1,39 +1,27 @@
-# Anurag Maurya — Portfolio v1
+# Gourav Maurya — Portfolio
 
-An editorial portfolio for Anurag Maurya, print and digital media designer in training at Macromedia Hamburg.
+Gourav’s full-stack AI engineering portfolio, based on the completed `anurags` design at commit `7e6eee9`. The editorial layout and animation system are unchanged.
 
-## Version 1.0.0
+Content includes Haven, Safar AI, AI Social Media Agent, professional experience, skills, education, GitHub, LinkedIn, and the supplied résumé. All four résumé links open `dist/assets/gourav-maurya-resume.pdf`.
 
-- Personal photography and oversized editorial typography
-- Selected work: Medientage Hamburg, Safarai Visual Mark, and Safarai Stationery
-- Design background, skills, languages, and résumé
-- Responsive layouts and accessible navigation
-- Email and résumé links, with a copy-email action
+## Local preview
 
-## Run locally
-
-This is a static website. No build step or dependency installation is required — the animation libraries are vendored in `dist/vendor/`.
+This is a static site; no build or installation is required.
 
 ```sh
-python -m http.server 4173 --directory dist
+python -m http.server 4185 --directory dist
 ```
-
-Open http://localhost:4173.
 
 ## Files
 
-- `dist/index.html`: page content
-- `dist/style.css`: base styling
-- `dist/selected-work.css`: Selected Work styling
-- `dist/motion.css`: opening sequence, scroll reveals, hover transitions
-- `dist/script.js`: copy-email interaction, opening sequence, scroll reveals
-- `dist/motion.js`: opening sequence, scroll choreography, cursor
-- `dist/vendor/`: GSAP (+ScrollTrigger, SplitText), Lenis and Motion, vendored so the site has no third-party runtime dependency
-- `dist/assets/`: photos, project images, and résumé
-- `.openai/hosting.json`: existing Sites deployment configuration
+- `dist/index.html`: personalized content and links
+- `dist/script.js`: copy-email interaction
+- `dist/style.css`, `dist/selected-work.css`: inherited design
+- `dist/motion.css`, `dist/motion.js`, `dist/vendor/`: inherited animations
+- `dist/assets/`: project visuals, temporary portraits, and résumé
 
-## Deployment
+## Branch and assets
 
-This is the `anurags` branch. `main` remains reserved for Gourav. The inherited Sites configuration belongs to Gourav’s existing private deployment; do not publish Anurag’s branch to that Site. Use a separate deployment target for Anurag. See `BRANCHES.md`.
+Continue Gourav’s work on `gourav-maurya`. Preserve `anurags` and `main` independently. The two Anurag portraits are retained temporarily with the user’s approval until Gourav provides replacement photos. Haven uses a labeled project overview graphic; the social agent links to Gourav’s GitHub profile because a project-specific link was not supplied.
 
-Personal photographs, résumé, and portfolio content belong to Anurag Maurya. No open-source license is granted by this repository.
+No deployment was performed. Check the target before using the inherited hosting configuration. See `BRANCHES.md`.
