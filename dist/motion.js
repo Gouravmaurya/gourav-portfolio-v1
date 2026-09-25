@@ -47,13 +47,13 @@
   if (root.classList.contains('intro') && !runIntro) root.classList.remove('intro');
 
   const introDone = () => {
-    root.classList.remove('intro', 'intro-go');
+    root.classList.remove('intro', 'intro-go', 'intro-lift');
     lenis.start();
   };
 
   if (runIntro) {
 
-    const HOLD = 0.3, DUR = 0.98;
+    const HOLD = 0.38, DUR = 1.15;
     let skipBtn = null, tl = null, over = false;
 
     const finish = () => {
@@ -100,16 +100,27 @@
       const tx = x0 - r.left - k * (x1 - r.left), ty = y0 - r.top - k * (y1 - r.top);
       const open = `inset(${-r.top}px ${r.right - vw}px ${r.bottom - vh}px ${-r.left}px)`;
 
-      const ease = 'power3.inOut';
+      const ease = 'power4.inOut';
       tl = gsap.timeline({ onComplete: finish });
+      /* The frame and the image share a duration, so the last frame is still the
+         exact hero layout — but not a curve. power4 is further along than power2
+         through the middle, so the window closes a little ahead of the picture
+         and the photo glides into its crop instead of the two moving locked
+         together. That small disagreement is what stops it reading mechanical. */
       tl.fromTo(fig, { clipPath: open }, { clipPath: 'inset(0px)', duration: DUR, ease }, HOLD)
         .fromTo(heroImg,
           { x: tx, y: ty, scale: k, transformOrigin: '0 0' },
-          { x: 0, y: 0, scale: 1, duration: DUR, ease }, HOLD);
+          { x: 0, y: 0, scale: 1, duration: DUR, ease: 'power2.inOut' }, HOLD);
 
-      root.classList.add('intro-go');
+      root.classList.add('intro-go', 'intro-lift');
 
-      const settle = HOLD + DUR * .55;
+      /* power4.inOut has spent essentially all of its travel by 90%, so the photo
+         is at its resting position here. Drop the lift and start the page
+         assembling at the same instant: nothing is left underneath the image to
+         pop forward, and the sequence reads as the photo settling and the layout
+         building around it rather than racing it. */
+      const settle = HOLD + DUR * .9;
+      tl.call(() => root.classList.remove('intro-lift'), null, settle);
 
       /* The two display words arrive letter by letter. Splitting happens here,
          after document.fonts.ready above, because character positions measured

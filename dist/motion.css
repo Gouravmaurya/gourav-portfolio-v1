@@ -12,7 +12,12 @@ html { scroll-padding-top: 24px; }
 /* --- 1. Opening sequence: start state only, GSAP drives the rest --- */
 /* html.intro is set by the inline head script before first paint, and removed
    by motion.js once the sequence finishes or is skipped. */
-.intro .hero-photo { z-index: 60; will-change: clip-path; }
+.intro .hero-photo { will-change: clip-path; }
+/* The lift is its own class because it must end when the photo lands, not when
+   the timeline does. While it is up, anything revealing underneath — MAURYA
+   most visibly, since its resting place sits right behind the photo — would
+   fade in behind the image and then jump forward the instant the lift dropped. */
+.intro-lift .hero-photo { z-index: 60; }
 .intro .hero-photo img { will-change: transform; }
 .intro:not(.intro-go) .hero-photo { opacity: 0; }
 .intro .dock, .intro .hero-top, .intro #hero-title, .intro .hero-intro, .intro .hero-aside,
