@@ -5,7 +5,11 @@
 /* Polish pass. Browser surfaces the design never claimed, and touch targets. */
 ::selection{background:var(--accent);color:var(--paper);text-shadow:none}
 .dark ::selection{background:var(--paper);color:var(--ink)}
-html{scrollbar-color:var(--line) var(--paper);scrollbar-width:thin}
+/* Scrollbars hidden: Lenis drives the scroll and the bars are visual noise on a
+   full-bleed layout. Wheel, trackpad, touch, keyboard and the scroll position
+   itself are all unaffected — only the chrome is gone. */
+html,body{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
 /* 19px and 32px respectively before this; the 44px floor is not optional on touch. */
 .socials a{padding:13px 0;margin:-13px 0}
 footer a{padding:16px 0;margin:-16px 0}
