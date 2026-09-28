@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-28T00:00:00Z",
+  "title": "Design System: Gourav Maurya Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "blue": {"role": "primary", "displayName": "Restrained Blue"},
+      "paper": {"role": "neutral", "displayName": "Chalk Paper"},
+      "ink": {"role": "neutral", "displayName": "Graphite"},
+      "muted": {"role": "neutral", "displayName": "Supporting Graphite"},
+      "glass": {"role": "neutral", "displayName": "Navigation Glass"},
+      "dark-surface": {"role": "neutral", "displayName": "Inverse Graphite"},
+      "contact-surface": {"role": "neutral", "displayName": "Pale Blue Contact Field"}
+    },
+    "typographyMeta": {
+      "display": {"displayName": "Hero Display", "purpose": "Hero statement with balanced wrapping."},
+      "headline": {"displayName": "Section Headline", "purpose": "Primary section titles."},
+      "title": {"displayName": "Project Title", "purpose": "Names of projects."},
+      "body": {"displayName": "Reading Text", "purpose": "Experience prose; supporting roles use the size variants documented in DESIGN.md."},
+      "label": {"displayName": "Control Label", "purpose": "Button and disclosure labels."}
+    },
+    "shadows": [
+      {"name": "navigation", "value": "0 6px 24px #242a3510", "purpose": "Float navigation above the page."},
+      {"name": "image-action", "value": "0 4px 18px #00000015", "purpose": "Separate white action pills from project images."}
+    ],
+    "motion": [
+      {"name": "ease", "value": "cubic-bezier(.16,1,.3,1)", "purpose": "Shared physical easing for controls, images, and portrait entry."},
+      {"name": "press", "value": "180ms", "purpose": "Button and contact arrow response; pressed scale .97."},
+      {"name": "project-hover", "value": "650ms", "purpose": "Fine-pointer image scale to 1.025."},
+      {"name": "disclosure-icon", "value": "220ms", "purpose": "Plus rotates 45 degrees when open."},
+      {"name": "disclosure-entry", "value": "200ms linear", "purpose": "Optional detail opacity transition from .3 to 1."},
+      {"name": "portrait-entry", "value": "700ms", "purpose": "Optional entry from opacity .3 and translateY(16px)."},
+      {"name": "hero-copy-entry", "value": "550ms linear", "purpose": "Optional initial copy fade from opacity .6."}
+    ],
+    "breakpoints": [
+      {"name": "tablet-max", "value": "1100px"},
+      {"name": "mobile-max", "value": "760px"},
+      {"name": "narrow-max", "value": "380px"}
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary action with immediate physical press feedback.",
+      "html": "<a class=\"ds-primary\" href=\"#work\">Explore my work <span aria-hidden=\"true\">↓</span></a>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:24px;min-height:52px;padding:0 23px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:600;border-radius:100px;white-space:nowrap;text-decoration:none;background:var(--ink,#222426);color:#fff;transition:transform 180ms var(--ease,cubic-bezier(.16,1,.3,1)),background-color 180ms var(--ease,cubic-bezier(.16,1,.3,1))}.ds-primary:focus-visible{outline:3px solid var(--blue,#245fbd);outline-offset:5px}.ds-primary:active{transform:scale(.97)}@media(hover:hover) and (pointer:fine){.ds-primary:hover{background:#3d454d}}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}.ds-primary:active{transform:none}}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet supporting action with the same target size as the primary button.",
+      "html": "<a class=\"ds-secondary\" href=\"#resume\">View résumé <span aria-hidden=\"true\">↗</span></a>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:24px;min-height:52px;padding:0 23px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:600;border-radius:100px;text-decoration:none;white-space:nowrap;background:#e6e8e9;color:var(--ink,#222426);transition:transform 180ms var(--ease,cubic-bezier(.16,1,.3,1)),background-color 180ms var(--ease,cubic-bezier(.16,1,.3,1))}.ds-secondary:focus-visible{outline:3px solid var(--blue,#245fbd);outline-offset:5px}.ds-secondary:active{transform:scale(.97)}@media(hover:hover) and (pointer:fine){.ds-secondary:hover{background:#d9dfe4}}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none}.ds-secondary:active{transform:none}}"
+    },
+    {
+      "name": "Project Disclosure",
+      "kind": "custom",
+      "refersTo": "project-disclosure",
+      "description": "Native disclosure keeps supporting project context in place without requiring JavaScript.",
+      "html": "<details class=\"ds-detail\"><summary>Behind the project <span aria-hidden=\"true\">+</span></summary><p>A real estate platform combining AI deal scouting, property research, virtual staging, and lifestyle-based recommendations.</p></details>",
+      "css": ".ds-detail{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;border-top:1px solid var(--line,#d9dcdd);max-width:440px;color:var(--ink,#222426)}.ds-detail summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:17px 0;list-style:none;font-size:14px;font-weight:600;min-height:52px;box-sizing:border-box}.ds-detail summary::-webkit-details-marker{display:none}.ds-detail summary>span{font-size:23px;font-weight:400;transition:transform 220ms var(--ease,cubic-bezier(.16,1,.3,1))}.ds-detail[open] summary>span{transform:rotate(45deg)}.ds-detail summary:focus-visible{outline:3px solid var(--blue,#245fbd);outline-offset:5px}.ds-detail p{margin:0;padding-bottom:10px;color:var(--muted,#62676d);font-size:15px;line-height:1.65}@media(prefers-reduced-motion:reduce){.ds-detail summary>span{transition:none}}"
+    },
+    {
+      "name": "Contact Action",
+      "kind": "button",
+      "refersTo": "contact-action",
+      "description": "Circular direct email action with restrained directional hover feedback.",
+      "html": "<a class=\"ds-contact\" href=\"mailto:gouravmaurya351@gmail.com\" aria-label=\"Email Gourav Maurya\"><span aria-hidden=\"true\">↗</span></a>",
+      "css": ".ds-contact{display:flex;align-items:center;justify-content:center;width:112px;height:112px;border-radius:50%;background:#222e3c;color:white;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:55px;text-decoration:none;transition:transform 180ms var(--ease,cubic-bezier(.16,1,.3,1)),background-color 180ms var(--ease,cubic-bezier(.16,1,.3,1))}.ds-contact:focus-visible{outline:3px solid var(--blue,#245fbd);outline-offset:5px}.ds-contact:active{transform:scale(.97)}@media(hover:hover) and (pointer:fine){.ds-contact:hover{transform:translate(3px,-3px);background:#375578}}@media(prefers-reduced-motion:reduce){.ds-contact{transition:none}.ds-contact:hover,.ds-contact:active{transform:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Product Demonstration Studio",
+    "overview": "An Apple-inspired material language pairs chalk surfaces, graphite type, muted blue accents, and generous whitespace. Large readable sans-serif headings and restrained image framing give engineering work room to speak. The interface feels composed, clear, and responsive to touch.\n\nThis document records the implemented system. The north star describes the direction already recorded in SURFACE.md; it is not a newly requested brand decision. Accessibility remains part of the material behavior: visible keyboard focus, native disclosures, and preference-aware motion and transparency.",
+    "keyCharacteristics": ["Quiet neutral surfaces with blue reserved for links and focus.", "Flat information rows, large images, and softly rounded controls.", "Physical press feedback and brief, nonblocking motion."],
+    "rules": [
+      {"name": "The Quiet Accent Rule", "body": "Blue identifies an action or emphasis; large body-copy areas retain neutral text.", "section": "colors"},
+      {"name": "The Floating Controls Rule", "body": "Reserve shadows for controls that sit over or above content; project copy and experience rows remain flat.", "section": "elevation"}
+    ],
+    "dos": ["Do preserve the neutral canvas, readable text hierarchy, and restrained blue accents.", "Do use consistent rounded image frames and flat information rows.", "Do retain visible keyboard focus and practical touch targets.", "Do preserve complete overview graphics on mobile and honor motion, transparency, and contrast preferences."],
+    "donts": ["Don't introduce scroll locking or loading gates for presentation effects.", "Don't apply a generic shadowed card shell to every project or experience item.", "Don't rely on hover, animation, or clipboard access to expose essential content and contact paths.", "Don't present generated concept artwork as a real product screenshot."]
+  }
+}
