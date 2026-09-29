@@ -1,39 +1,26 @@
-# Anurag Maurya — Portfolio v1
+# Anurag Maurya — bilingual portfolio
 
-An editorial portfolio for Anurag Maurya, print and digital media designer in training at Macromedia Hamburg.
+Anurag’s portfolio is available in German and English. German is the default. The DE/EN control stays visible while scrolling, remembers the visitor’s choice, and preserves the current section when switching.
 
-## Version 1.0.0
-
-- Personal photography and oversized editorial typography
-- Selected work: Medientage Hamburg, Safarai Visual Mark, and Safarai Stationery
-- Design background, skills, languages, and résumé
-- Responsive layouts and accessible navigation
-- Email and résumé links, with a copy-email action
-
-## Run locally
-
-This is a static website. No build step or dependency installation is required — the animation libraries are vendored in `dist/vendor/`.
+## Preview
 
 ```sh
 python -m http.server 4173 --directory dist
 ```
 
-Open http://localhost:4173.
+Open `http://localhost:4173/` for German or `http://localhost:4173/?lang=en` for English. The original résumé and artwork are shared by both languages. The résumé PDF is the supplied file; its contents are not translated by the website switch.
 
-## Files
+## Editing copy
 
-- `dist/index.html`: page content
-- `dist/style.css`: base styling
-- `dist/selected-work.css`: Selected Work styling
-- `dist/motion.css`: opening sequence, scroll reveals, hover transitions
-- `dist/script.js`: copy-email interaction, opening sequence, scroll reveals
-- `dist/motion.js`: opening sequence, scroll choreography, cursor
-- `dist/vendor/`: GSAP (+ScrollTrigger, SplitText), Lenis and Motion, vendored so the site has no third-party runtime dependency
-- `dist/assets/`: photos, project images, and résumé
-- `.openai/hosting.json`: existing Sites deployment configuration
+- `source/index.en.html` is the original English source.
+- `source/translations.json` contains the German page copy. Image descriptions and control labels live in `build-i18n.py`.
+- Run `python build-i18n.py` after changing copy. It generates the German default `dist/index.html` and the English switch logic in `dist/i18n.js`.
+- `dist/i18n.css` styles the switch and adapts longer German headings on narrow screens.
 
-## Deployment
+The existing layout, animation scripts, project images, and résumé remain in `dist/`. The switch loads before the animation scripts so animated headings receive the correct language.
 
-This is the `anurags` branch. `main` remains reserved for Gourav. The inherited Sites configuration belongs to Gourav’s existing private deployment; do not publish Anurag’s branch to that Site. Use a separate deployment target for Anurag. See `BRANCHES.md`.
+## Branch
+
+This work is on `anurags`. Gourav’s portfolio branches are independent. The inherited Sites configuration belongs to Gourav’s deployment; use a separate target to publish Anurag’s site.
 
 Personal photographs, résumé, and portfolio content belong to Anurag Maurya. No open-source license is granted by this repository.

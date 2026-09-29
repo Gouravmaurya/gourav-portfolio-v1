@@ -1,0 +1,13 @@
+.language-switch{position:fixed;right:18px;top:18px;z-index:90;display:flex;align-items:center;gap:6px;padding:7px 9px;background:var(--paper);border:1px solid var(--ink);font:600 11px/1 var(--sans);box-shadow:0 5px 20px #0002}
+.language-switch button{border:0;background:transparent;color:var(--ink);padding:8px 6px;cursor:pointer;min-width:30px;min-height:30px}
+.language-switch button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.language-switch button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:899px){.language-switch{top:12px;right:12px;bottom:auto;left:auto}}
+@media(max-width:600px){.language-switch{top:9px;right:8px;padding:4px 5px;font-size:10px}.language-switch button{padding:6px 4px;min-width:26px;min-height:28px}}
+
+@media(max-width:600px){.hero-top{padding-top:38px}}
+@media(max-width:600px){.dock{gap:4px;padding:8px 9px}.dock-links{gap:9px}.dock-links a,.dock-contact{font-size:11px;letter-spacing:.1px;padding-inline:0}.dock-mark{font-size:22px}.dock-links sup{font-size:8px;margin-left:1px}}
+@media(max-width:350px){.dock-links{gap:6px}.dock-links a,.dock-contact{font-size:10px}.dock-mark{font-size:20px}}
+@media(max-width:350px){.work .section-heading h2{font-size:58px}}
+.work .project-heading>div{min-width:0;flex:1}
+.work .project-heading h3{overflow-wrap:anywhere}

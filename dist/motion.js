@@ -155,7 +155,7 @@
       skipBtn = document.createElement('button');
       skipBtn.type = 'button';
       skipBtn.className = 'intro-skip';
-      skipBtn.textContent = 'SKIP';
+      skipBtn.textContent = root.lang === 'de' ? 'ÜBERSPRINGEN' : 'SKIP';
       skipBtn.addEventListener('click', finish);
       document.body.appendChild(skipBtn);
       SKIP_ON.forEach(t => addEventListener(t, finish, { passive: true }));
