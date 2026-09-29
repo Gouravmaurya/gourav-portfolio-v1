@@ -9,7 +9,7 @@ attrs={
 'Anurag Maurya — home':'Anurag Maurya — Startseite',
 'Anurag Maurya outdoors in warm evening light':'Anurag Maurya im warmen Abendlicht im Freien',
 'Selected work':'Ausgewählte Arbeiten',
-'3 projects':'3 Projekte',
+'7 projects':'7 Projekte',
 'View Medientage Hamburg 2026 artwork':'Arbeit zu Medientage Hamburg 2026 ansehen',
 'Medientage Hamburg 2026 design study by Anurag Maurya':'Gestaltungsstudie zu Medientage Hamburg 2026 von Anurag Maurya',
 'Open Medientage Hamburg 2026 artwork':'Arbeit zu Medientage Hamburg 2026 öffnen',
@@ -21,6 +21,18 @@ attrs={
 'Open Safarai — Stationery artwork':'Arbeit zur Safarai-Geschäftsausstattung öffnen',
 'Portrait of Anurag Maurya':'Porträt von Anurag Maurya',
 'Email Anurag Maurya':'E-Mail an Anurag Maurya',
+'Collage of print, digital media, technology, and Hamburg Messe + Congress imagery':'Collage aus Print, digitalen Medien, Technologie und Motiven von Hamburg Messe + Congress',
+'Collage of design process, social media imagery, and Hamburg Messe + Congress branding':'Collage zu Gestaltungsprozess, Social Media und Markenbild von Hamburg Messe + Congress',
+'Lumiere restaurant homepage with a dark dining room photograph and elegant headline':'Lumiere-Restaurantseite mit dunkler Fotografie des Gastraums und eleganter Überschrift',
+'Café Farol homepage with a café interior photograph, large headline, and navigation':'Café-Farol-Startseite mit Innenraumfotografie, großer Überschrift und Navigation',
+'View Hamburg Messe + Congress — Media Directions artwork':'Arbeit zu Hamburg Messe + Congress — Medienkonzepte ansehen',
+'Open Hamburg Messe + Congress — Media Directions artwork':'Arbeit zu Hamburg Messe + Congress — Medienkonzepte öffnen',
+'View Hamburg Messe + Congress — Design Directions artwork':'Arbeit zu Hamburg Messe + Congress — Gestaltungskonzepte ansehen',
+'Open Hamburg Messe + Congress — Design Directions artwork':'Arbeit zu Hamburg Messe + Congress — Gestaltungskonzepte öffnen',
+'View Lumiere — Restaurant Website artwork':'Arbeit zu Lumiere — Restaurant-Website ansehen',
+'Open Lumiere — Restaurant Website artwork':'Arbeit zu Lumiere — Restaurant-Website öffnen',
+'View Café Farol — Website artwork':'Arbeit zu Café Farol — Website ansehen',
+'Open Café Farol — Website artwork':'Arbeit zu Café Farol — Website öffnen',
 }
 copy.update(attrs)
 s=source.read_text(encoding='utf-8')
