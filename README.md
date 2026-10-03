@@ -18,11 +18,11 @@ python -m http.server 4185 --directory dist
 - `dist/script.js`: copy-email interaction
 - `dist/style.css`, `dist/selected-work.css`: inherited design
 - `dist/motion.css`, `dist/motion.js`, `dist/vendor/`: inherited animations
-- `dist/assets/`: project visuals, temporary portraits, and résumé
+- `dist/assets/`: project visuals, Gourav’s portraits, and résumé
 
 ## Branch and assets
 
-Continue Gourav’s work on `gourav-maurya`. Preserve `anurags` and `main` independently. The two Anurag portraits are retained temporarily with the user’s approval until Gourav provides replacement photos. Haven uses a labeled project overview graphic; the social agent links to Gourav’s GitHub profile because a project-specific link was not supplied.
+Continue Gourav’s work on `gourav-maurya`. Preserve `anurags` and `main` independently. The hero uses Gourav’s mountain portrait and About uses his direct blazer portrait. Haven uses a labeled project overview graphic; the social agent links to Gourav’s GitHub profile because a project-specific link was not supplied.
 
 No deployment was performed. Check the target before using the inherited hosting configuration. See `BRANCHES.md`.
 

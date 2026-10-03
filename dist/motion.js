@@ -92,7 +92,7 @@
       /* ... and where it starts: covering the viewport, framed on the face.
          FACE/AIM are calibrated to this photo — retune them if the portrait changes.
          A phone's viewport is far taller than the photo, so it needs a tighter crop. */
-      const FACE = .24, AIM = .32, zoom = vw < 700 ? 1.45 : 1;
+      const FACE = .46, AIM = .40, zoom = vw < 700 ? 1.45 : 1;
       const s0 = Math.max(vw / iw, vh / ih) * zoom;
       const x0 = (vw - iw * s0) * .5;
       const y0 = Math.min(0, Math.max(vh - ih * s0, AIM * vh - FACE * ih * s0));
